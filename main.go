@@ -37,7 +37,7 @@ func main() {
 func getWpPosts(path string) []*WpPost {
 	in, err := os.Open(path)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	defer func(in *os.File) {
@@ -46,8 +46,9 @@ func getWpPosts(path string) []*WpPost {
 
 	var posts []*WpPost
 
-	if err := gocsv.UnmarshalFile(in, &posts); err != nil {
-		panic(err)
+	err = gocsv.UnmarshalFile(in, &posts)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	return posts
