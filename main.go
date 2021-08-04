@@ -55,13 +55,14 @@ func getWpPosts(path string) []*WpPost {
 }
 
 func processUrl(url string) {
-	resp, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	for {
+		resp, err := http.Get(url)
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		cacheStatus := resp.Header.Get("CF-Cache-Status")
+
 		fmt.Println("CF-Cache-Status = ", cacheStatus)
 		if cacheStatus == "HIT" {
 			break
