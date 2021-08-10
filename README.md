@@ -1,4 +1,15 @@
 # wp-cloudflare-cache-warmup
+This is a simple golang-app, that takes a csv-file (in a format described below) as stdin and warming-up 
+[the CloudFlare CDN-caches](https://www.cloudflare.com/learning/cdn/what-is-caching/). 
+This is achieved by sending http-get-requests for each url until 
+`CF-Cache-Status = HIT` http-response-header is appeared.
+
+CSV-file format:
+```text
+id,Title,Permalink,Status
+9,"Some title",https://example.com/example-resource/,publish
+```
+
 
 ## Running last release
 ```shell
@@ -9,7 +20,9 @@ cd $(mktemp -d) \
 && ./wp-cloudflare-cache-warmup '/home/yakunin/Downloads/Zapisi-Export-2020-December-14-1031.csv'
 ```
 
-## Building from source files
+## Building
+
+Following command builds this project into executable binary file:
 ```shell
 go build .
 ```
