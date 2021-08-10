@@ -1,4 +1,4 @@
-module wp-cloudflare-cache-warmup
+module cloudflare-cache-warmup
 
 go 1.16
 
