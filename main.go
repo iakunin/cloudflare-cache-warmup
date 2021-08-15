@@ -66,7 +66,7 @@ func processUrl(url string) {
 
 		cacheStatus := resp.Header.Get("CF-Cache-Status")
 
-		log.Printf("Url=%s;\nCF-Cache-Status=%s\n", url, cacheStatus)
+		log.Printf("Url=%s; CF-Cache-Status=%s\n", url, cacheStatus)
 		if cacheStatus == "HIT" {
 			break
 		}
