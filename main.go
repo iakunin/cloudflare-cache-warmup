@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"flag"
 	"github.com/gocarina/gocsv"
 	"io"
 	"log"
@@ -17,19 +17,33 @@ type Item struct {
 }
 
 func main() {
-	items := getItems(os.Stdin)
-	for i, item := range items {
-		if item.Status == "publish" {
-			fmt.Printf(
-				"(%d of %d) Processing url = %s \n",
-				i,
-				len(items),
-				item.Permalink,
-			)
+	maxGoroutines := flag.Int("goroutines", 50, "goroutines count")
+	flag.Parse()
 
+	items := filterUnpublished(
+		getItems(os.Stdin),
+	)
+	guard := make(chan struct{}, *maxGoroutines)
+
+	for _, item := range items {
+		guard <- struct{}{} // would block if guard channel is already filled
+		go func(item *Item) {
 			processUrl(item.Permalink)
+			<-guard // removes an int from semaphore, allowing another to proceed
+		}(item)
+	}
+}
+
+func filterUnpublished(items []*Item) []*Item {
+	var result []*Item
+
+	for _, item := range items {
+		if item.Status == "publish" {
+			result = append(result, item)
 		}
 	}
+
+	return result
 }
 
 func getItems(reader io.Reader) []*Item {
@@ -52,7 +66,7 @@ func processUrl(url string) {
 
 		cacheStatus := resp.Header.Get("CF-Cache-Status")
 
-		fmt.Println("CF-Cache-Status = ", cacheStatus)
+		log.Printf("Url=%s;\nCF-Cache-Status=%s\n", url, cacheStatus)
 		if cacheStatus == "HIT" {
 			break
 		}
